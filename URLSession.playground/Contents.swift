@@ -31,7 +31,7 @@ let urlSession = URLSession(configuration: urlConfig)
  URLSessionTask Types
  There are three types of concrete session tasks:
  
- 1. URLSessionDataTask: Use this task for GET requests to retrieve data from servers to memory.
+ 1. URLSessionDataTask: Use this task for GET/POST requests to retrieve data from servers to memory.
  2. URLSessionUploadTask: Use this task to upload a file from disk to a web service via a POST or PUT method.
  3. URLSessionDownloadTask: Use this task to download a file from a remote service to a temporary file location. You can also suspend, resume and cancel tasks like other two. URLSessionDownloadTask has the extra ability to pause for future resumption.
  */
@@ -52,7 +52,7 @@ let task = urlSession.dataTask(with: url) { (data, response, error) in
   }
   
   if let result = NSString(data: data, encoding: String.Encoding.utf8.rawValue) as String? {
-    print(result)
+    print(result);
   }
   
   PlaygroundPage.current.finishExecution()
@@ -60,6 +60,20 @@ let task = urlSession.dataTask(with: url) { (data, response, error) in
 
 task.resume()
 
+//================****************================
+
+extension Data {
+    var prettyPrintedJSONString: NSString? {
+        guard let jsonObject = try? JSONSerialization.jsonObject(with: self, options: []),
+              let data = try? JSONSerialization.data(withJSONObject: jsonObject,
+                                   options: [.prettyPrinted]),
+              let prettyJSON = NSString(data: data, encoding: String.Encoding.utf8.rawValue) else {
+                return nil
+             }
+
+        return prettyJSON
+    }
+}
 
 let urlSessionConfig = URLSessionConfiguration.default
 urlSessionConfig.allowsCellularAccess = true
@@ -83,7 +97,13 @@ let newTask = newURLSession.dataTask(with: newURL) { data, response, error in
   
   if let result = NSString(data: data, encoding: String.Encoding.utf8.rawValue) as? String {
     print(result)
+  } else {
+    print(data.prettyPrintedJSONString ?? "");
   }
 }
 
 newTask.resume()
+
+
+
+
